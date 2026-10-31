@@ -116,7 +116,7 @@ The project roadmap covers CCSDS protocol analysis, telemetry inspection, teleco
 ---
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/BroadbentT/STARLINK/refs/heads/main/babyFrame.gif" width="500">
+  <img src="https://raw.githubusercontent.com/BroadbentT/STARLINK/refs/heads/main/babyFrame.gif">
 </p>
 
 ## STARLINK — HTB Satellite Exploitation Track Cross-Reference
