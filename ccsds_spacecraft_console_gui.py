@@ -218,7 +218,8 @@ class SpacecraftGUI(tk.Tk):
             ("Automated Tracking System", self.run_automated_tracking, True),
             ("Breach Ground Station", self.run_groundstation_security_check, True),
             ("Demodulate AFSK 1200 Telecommand Signal", self.run_afsk_demodulator, True),
-            ("Transmit AFSK 1200 Telecommand Signal", self.run_afsk_telecommand, True),
+            ("Transmit AFSK 1200 Telecommand Signal", self.run_afsk_telecommand, False),
+            ("Clear connection", self.run_clear, True),
             ("Exit", self.destroy, True),]
 
         for index, (label, command, enabled) in enumerate(operation_specs):
@@ -420,6 +421,35 @@ class SpacecraftGUI(tk.Tk):
             self.log("INFO", "AFSK 1200 signal trasnsmission cancelled by user")
             return
         self._run_config_script("spaceOps.py", "AFSK 1220 signal transmission")
+
+# ------------------------------------------------------------------------------------- 
+# AUTHOR  : Terence Broadbent                                                    
+# CONTRACT: GitHub
+# Version : CORE
+# Details : Reset 
+# Modified: N/A
+# -------------------------------------------------------------------------------------
+
+    def run_clear(self):
+        if not messagebox.askyesno("Clear Connection","This will reset all connection parameters, packet counters, " "payload data and selected files to their default values.\n\nContinue?",parent=self):
+            self.log("INFO", "clear connection cancelled by user")
+            return
+        for key, value in DEFAULTS.items():
+            if key == "payload":
+                continue
+            self.vars[key].set(str(value))
+        self.endpoint_var.set("")
+        self.payload_mode.set("text")
+        self.payload_text.delete("1.0", "end")
+        self.payload_text.insert("1.0", DEFAULTS["payload"].decode("utf-8"))
+        self.selected_audio_path.set("")
+        self.file_list.selection_clear(0, "end")
+        self.output.configure(state="normal")
+        self.output.delete("1.0", "end")
+        self.output.configure(state="disabled")
+        self.status.set("Connection parameters reset to defaults")
+        self.log("INFO", "Connection cleared — all console variables restored to defaults")
+        messagebox.showinfo("Clear Connection","All console variables have been reset successfully.",parent=self)
 
 # -------------------------------------------------------------------------------------
 
