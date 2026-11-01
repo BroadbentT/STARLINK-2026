@@ -1,4 +1,4 @@
-# 🛰️ STARLINK 2026 EDITION
+# 🛰️ STARLINK 2026
 
 **ALPHA RELEASE | Satellite Cybersecurity Research Toolkit**
 
@@ -213,7 +213,7 @@ python3 ccsds_spacecraft_console.py
 | python3  | 5cbd97e7586136db701817b3bc31786f  | scalpedPlatformDecrypt.py        | Beta    |
 | python3  | 70ddbedeb3336f1df8cdbd17c178922c  | signalFromSpace.py               | Alpha   |
 | python3  | cdb12ef696f4aeeca20d7f599c7c5db8  | tmTelecommand.py                 | Alpha   |
-| python3  | d638e8da04e0538d0f6ca6c39d8af775  | viewPacket.py |                  | Alpha   |
+| python3  | d638e8da04e0538d0f6ca6c39d8af775  | viewPacket.py                    | Alpha   |
 
 
 ## LEGAL & ETHICAL USE
