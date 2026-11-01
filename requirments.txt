@@ -1,0 +1,5 @@
+pwntools
+skyfield
+sgp4
+numpy
+scipy

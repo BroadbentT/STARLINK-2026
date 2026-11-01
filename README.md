@@ -183,10 +183,13 @@ Check the Python installation:
 python3 --version
 ```
 
-Install the project's declared dependencies, if a `requirements.txt` is provided:
+Install the project's declared dependencies:
 
 ```bash
+python3 -m pip install --upgrade pip
 python3 -m pip install -r requirements.txt
+
+sudo apt install python3-tk
 ```
 
 Run the console:
