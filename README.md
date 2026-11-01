@@ -1,6 +1,6 @@
 # 🛰️ STARLINK 2026 EDITION
 
-**BETA RELEASE | Satellite Cybersecurity Research Toolkit**
+**ALPHA RELEASE | Satellite Cybersecurity Research Toolkit**
 
 <p align="center">
   <img src="https://github.com/BroadbentT/STARLINK/blob/main/Neon%20Satellite%20Exploitation%20Command%20Center.png" alt="STARLINK Command Centre">
@@ -17,7 +17,7 @@ The project roadmap covers CCSDS protocol analysis, telemetry inspection, teleco
 **Platform:** Kali Linux 2026
 **Language:** Python 3
 **Interface:** Command-line interface (CLI)
-**Release:** Beta
+**Release:** Alpha
 **Target environment:** Authorised assessments, laboratory simulations, CTFs and isolated test systems.
 
 ---
@@ -202,10 +202,19 @@ python3 ccsds_spacecraft_console.py
 
 ## PROJECT METADATA
 
-| Language | Filename                          | MD5 Hash                         | Version |
+| Language | MD5 Hash                          | Filename                         | Version |
 | -------- | -----------------------------     | ----------------------           | ------- |
-| Python3  | `ccsds_spacecraft_console.py`     | 8d8c0b192207b1ccccdb73fe47f5a15f | Beta    |
-| Python3  | `ccsds_spacecraft_console_gui.py` | 400b7474dd45796130b21a5ef944fc34 | Beta    |
+| python3  | 0c3c85af61b24490f1208da8fdc01ed3  | adTelecommand.py                 | Alpha   |
+| python3  | 31ff54d66c79ed0a4a1c12b5b3cca145  | antennaPointing.py               | Alpha   |
+| python3  | 3bd10b26abe8bef3f61a5062df89a51b  | ccsds_spacecraft_console_gui.py  | Alpha   |
+| python3  | 3ca5aca06deb967860692269fb70b90f  | firstContact.py                  | Alpha   |
+| python3  | 82fa8ab5bc0ba0d37526da7cb2c72af1  | groundStationBreach.py           | Alpha   |
+| python3  | 746e7208e7c4bacc25451624c87ed0f8  | scalpedPlatform.py               | Beta    |
+| python3  | 5cbd97e7586136db701817b3bc31786f  | scalpedPlatformDecrypt.py        | Beta    |
+| python3  | 70ddbedeb3336f1df8cdbd17c178922c  | signalFromSpace.py               | Alpha   |
+| python3  | cdb12ef696f4aeeca20d7f599c7c5db8  | tmTelecommand.py                 | Alpha   |
+| python3  | d638e8da04e0538d0f6ca6c39d8af775  | viewPacket.py |                  | Alpha   |
+
 
 ## LEGAL & ETHICAL USE
 
