@@ -138,7 +138,6 @@ class SpacecraftGUI(tk.Tk):
         right = ttk.Frame(main)
         main.add(left, weight=1)
         main.add(right, weight=2)
-
         params = ttk.LabelFrame(left, text="Mission parameters", padding=10)
         params.pack(fill="x")
         ttk.Label(params, text="Target endpoint (IP:PORT)").grid(row=0, column=0, sticky="w", pady=4)
@@ -147,23 +146,20 @@ class SpacecraftGUI(tk.Tk):
         endpoint_entry.grid(row=0, column=1, sticky="ew", padx=(8, 4), pady=4)
         ttk.Button(params, text="Split", command=self.apply_endpoint).grid(row=0, column=2, sticky="ew", padx=(0, 0), pady=4)
         endpoint_entry.bind("<Return>", lambda _event: self.apply_endpoint())
-
         fields = [
             ("host", "Target IP / hostname"),
             ("port", "Target TCP port (1–65535)"),
-            ("port2", "Listening TCP port (1-65535)"),
+            ("port2", "Listening TCP port (0 = disabled)"),
             ("spacecraft_id", "Spacecraft ID (0–1023)"),
             ("virtual_channel_id", "Virtual channel ID (0–63)"),
             ("apid", "APID (0–2047)"),
             ("packet_count", "Space packet sequence (0–16383)"),
             ("tc_packet_count", "TC frame sequence (0–255)"),]
-
         for row, (key, label) in enumerate(fields, start=1):
             ttk.Label(params, text=label).grid(row=row, column=0, sticky="w", pady=4)
             var = tk.StringVar()
             self.vars[key] = var
             ttk.Entry(params, textvariable=var, width=22).grid(row=row, column=1, columnspan=2, sticky="ew", padx=(8, 0), pady=4)
-
         params.columnconfigure(1, weight=1)
         left_detail_panes = ttk.Panedwindow(left, orient="vertical")
         left_detail_panes.pack(fill="both", expand=True, pady=(10, 0))
@@ -174,13 +170,11 @@ class SpacecraftGUI(tk.Tk):
         self.payload_mode = tk.StringVar(value="text")
         mode_row = ttk.Frame(payload_frame)
         mode_row.pack(fill="x", pady=(0, 6))
-
         ttk.Radiobutton(mode_row, text="Text / ASCII", variable=self.payload_mode,value="text").pack(side="left")
         ttk.Radiobutton(mode_row, text="Hex bytes", variable=self.payload_mode,value="hex").pack(side="left", padx=(12, 0))
         self.payload_text = ScrolledText(payload_frame, height=5, wrap="word")
         self.payload_text.pack(fill="both", expand=True)
-        ttk.Label(payload_frame, text="Hex mode accepts spaces, colons, or hyphens.",foreground="gray").pack(anchor="w", pady=(5, 0))
-        
+        ttk.Label(payload_frame, text="Hex mode accepts spaces, colons, or hyphens.",foreground="gray").pack(anchor="w", pady=(5, 0))    
         file_frame = ttk.LabelFrame(content_panes, text="File Management", padding=10)
         content_panes.add(file_frame, weight=1)
         self.selected_audio_path = tk.StringVar(value="")
@@ -202,12 +196,10 @@ class SpacecraftGUI(tk.Tk):
         ttk.Label(file_frame, text="Assigned variable: selected_audio_path").pack(anchor="w", pady=(7, 0))
         ttk.Entry(file_frame, textvariable=self.selected_audio_path, state="readonly").pack(fill="x", pady=(2, 0))
         self.refresh_file_list()
-
         right_workspace = ttk.Panedwindow(right, orient="vertical")
         right_workspace.pack(fill="both", expand=True)
         operations_frame = ttk.LabelFrame(right_workspace, text="Operations — full menu", padding=8)
         right_workspace.add(operations_frame, weight=2)
-
         operation_specs = [
             ("Preview CCSDS Frame",self.run_preview, True),
             ("Check Connection to Spacecraft", self.test_connection, True),
@@ -221,7 +213,6 @@ class SpacecraftGUI(tk.Tk):
             ("Transmit AFSK 1200 Telecommand Signal", self.run_afsk_telecommand, False),
             ("Clear connection", self.run_clear, True),
             ("Exit", self.destroy, True),]
-
         for index, (label, command, enabled) in enumerate(operation_specs):
             button = ttk.Button(operations_frame, text=label, command=command)
             button.grid(row=index // 2, column=index % 2, sticky="ew", padx=4, pady=3)
@@ -229,13 +220,11 @@ class SpacecraftGUI(tk.Tk):
                 button.configure(state="disabled")
         operations_frame.columnconfigure(0, weight=1)
         operations_frame.columnconfigure(1, weight=1)
-
         output_frame = ttk.LabelFrame(right_workspace, text="Output", padding=8)
         right_workspace.add(output_frame, weight=2)
         self.output = ScrolledText(output_frame, height=10, wrap="none", font=("Consolas", 9),undo=False)
         self.output.pack(fill="both", expand=True)
         self.output.configure(state="disabled")
-
         terminal_frame = ttk.LabelFrame(left_detail_panes, text="Terminal / diagnostic log", padding=6)
         left_detail_panes.add(terminal_frame, weight=1)
         terminal_toolbar = ttk.Frame(terminal_frame)
@@ -400,12 +389,14 @@ class SpacecraftGUI(tk.Tk):
         if audio_path.suffix.lower() != ".wav":
             messagebox.showerror("Invalid input file", "signalFromSpace.py requires a .wav file.", parent=self)
             return
-        if not script_path.is_file():
-            self.log("AFSK 1200 Demodulator", f"Required script was not found next to this GUI:{script_path}")
-            return
         self.status.set(f"Running AFSK demodulator on {audio_path.name}…")
         self.log("INFO", f"Starting signalFromSpace.py with selected_audio_path={audio_path}")
-        threading.Thread(target=self._audio_script_worker,args=(str(script_path), str(audio_path), "AFSK 1200 Demodulator"),daemon=True).start()
+        self.payload_text.delete("1.0", "end")
+        self.payload_text.insert("1.0", audio_path)
+        if not messagebox.askyesno("Confirm AFSK 1200 Demodulator Command","This will launch signalFromSpace.py.",parent=self,):
+            self.log("INFO", "AFSK 1200 demodulator cancelled by user")
+            return
+        self._run_config_script("signalFromSpace.py","AFSK 1200 Demodulator")
 
 # ------------------------------------------------------------------------------------- 
 # AUTHOR  : Terence Broadbent                                                    
@@ -426,7 +417,7 @@ class SpacecraftGUI(tk.Tk):
 # AUTHOR  : Terence Broadbent                                                    
 # CONTRACT: GitHub
 # Version : CORE
-# Details : Reset 
+# Details : Reset screen
 # Modified: N/A
 # -------------------------------------------------------------------------------------
 
@@ -509,6 +500,8 @@ class SpacecraftGUI(tk.Tk):
         self.status.set("Selected file cleared")
         self.log("INFO", "Cleared selected_audio_path")
 
+# -------------------------------------------------------------------------------------
+
     def _run_config_script(self, script_name, display_name):
         script_path = Path(__file__).resolve().parent / script_name
         if not script_path.is_file():
@@ -573,6 +566,8 @@ class SpacecraftGUI(tk.Tk):
         self._append_live_output("\n" + separator + "\n" + title + "\n")
         self.status.set(status_text)
 
+# -------------------------------------------------------------------------------------
+
     def _audio_script_worker(self, script_path, audio_path, display_name):
         try:
             result = subprocess.run([sys.executable, script_path, audio_path],capture_output=True, text=True, timeout=300, check=False,cwd=str(Path(script_path).resolve().parent),)
@@ -634,7 +629,6 @@ class SpacecraftGUI(tk.Tk):
         self.status.set("Defaults loaded")
 
     def _write(self, text, level="INFO"):
-        # Keep the main results pane for the latest tool output and append a persistent terminal log.
         self.output.configure(state="normal")
         self.output.delete("1.0", "end")
         self.output.insert("1.0", text.rstrip() + "\n")
@@ -697,15 +691,7 @@ class SpacecraftGUI(tk.Tk):
             if self.endpoint_var.get().strip():
                 raise ValueError("Correct the Target endpoint field or clear it before continuing.")
         result = {}
-        ranges = {
-            "port": (0, 65535),
-            "port2": (0, 65535),
-            "spacecraft_id": (0, 1023),
-            "virtual_channel_id": (0, 63),
-            "apid": (0, 2047),
-            "packet_count": (0, 16383),
-            "tc_packet_count": (0, 255),
-        }
+        ranges = {"port": (1, 65535),"port2": (1, 65535),"spacecraft_id": (0, 1023),"virtual_channel_id": (0, 63),"apid": (0, 2047),"packet_count": (0, 16383),"tc_packet_count": (0, 255),}
         result["host"] = self.vars["host"].get().strip()
         if not result["host"]:
             raise ValueError("Target host cannot be empty.")

@@ -16,12 +16,58 @@
 
 import os
 import sys
+import json
 import wave
+import argparse
 import subprocess
 import numpy as np
 from scipy import signal
 
 from pwn import hexdump, log, remote
+
+# ------------------------------------------------------------------------------------- 
+# AUTHOR  : Terence Broadbent                                                    
+# CONTRACT: GitHub
+# Version : CORE
+# Details : Load application variables via JSON configuration or command-line
+# Modified: N/A
+# -------------------------------------------------------------------------------------
+
+if len(sys.argv) == 2 and sys.argv[1].lstrip().startswith("{"):
+    config = json.loads(sys.argv[1])
+else:
+    parser = argparse.ArgumentParser(description="Spacecraft tracking system")
+    parser.add_argument("--host", required=False)
+    parser.add_argument("--port", type=int, required=False)
+    parser.add_argument("--port2", type=int, required=False)
+    parser.add_argument("--spacecraft-id", type=int, required=False)
+    parser.add_argument("--virtual-channel-id", type=int, required=False)
+    parser.add_argument("--apid", type=int, required=False)
+    parser.add_argument("--payload", required=True)
+    parser.add_argument("--packet-count", type=int, required=False)
+    parser.add_argument("--tc-packet-count", type=int, required=False)
+    args = parser.parse_args()
+    config = {
+        "host": args.host,
+        "port": args.port,
+        "port2": args.port2,
+        "spacecraft_id": args.spacecraft_id,
+        "virtual_channel_id": args.virtual_channel_id,
+        "apid": args.apid,
+        "payload": args.payload,
+        "packet_count": args.packet_count,
+        "tc_packet_count": args.tc_packet_count,
+    }
+
+host = (config["host"])
+port = (config["port"])
+port2 = (config["port2"])
+spacecraft_id = (config["spacecraft_id"])
+virtual_channel_id = (config["virtual_channel_id"])
+apid = (config["apid"])
+payload = (config["payload"]) # .encode("utf-8"))
+packet_count = (config["packet_count"])
+tc_packet_count = (config["tc_packet_count"])
 
 # ------------------------------------------------------------------------------------- 
 # AUTHOR  : Terence Broadbent                                                    
@@ -47,41 +93,14 @@ def print_header(title):
     print(f"║ {title:^96} ║")
     print("╚" + "═" * 98 + "╝\n")
 
-"""Demodulate a WAV file. An explicit path enables non-interactive GUI use."""
-
-def demodulate(input_path=None):
+def demodulate():
+    input_path = payload
+    path = payload
     print_header("AFSK1200 SIGNAL DEMODULATOR")
-    if input_path:
-        path = os.path.abspath(os.path.expanduser(input_path))
-        if not path.lower().endswith(".wav"):
-            print(f"ERROR: Input file must have a .wav extension: {path}")
-            return
-        if not os.path.isfile(path):
-            print(f"ERROR: WAV file not found: {path}")
-            return
-        print(f"Using WAV file supplied by caller: {path}")
-    else:
-        wav_files = [f for f in os.listdir(".")
-                     if f.lower().endswith(".wav") and os.path.isfile(f)]
-        if wav_files:
-            print("WAV files in the current directory:")
-            for f in wav_files:
-                print(f" - {f}")
-        else:
-            print("No WAV files found in the current directory.")
-            return
-        while True:
-            path = input("\nEnter the WAV filename: ").strip()
-            if not path.lower().endswith(".wav"):
-                print("Please enter a filename ending in .wav.")
-            elif os.path.isfile(path):
-                print(f"File found: {path}")
-                path = os.path.abspath(path)
-                break
-            else:
-                print("File not found. Please try again.")
 
-    # STAGE 1: LOAD WAV FILE
+# -------------------------------------------------------------------------------------
+# STAGE 1: LOAD WAV FILE
+# -------------------------------------------------------------------------------------
 
     print("\n" + underline)
     print("[1] LOADING WAV FILE")
@@ -122,7 +141,9 @@ def demodulate(input_path=None):
         print(f"\nERROR: Unsupported channel count: {nch}")
         return
 
-    # STAGE 2: PREPARE AUDIO SAMPLES
+# -------------------------------------------------------------------------------------
+# STAGE 2: PREPARE AUDIO SAMPLES
+# -------------------------------------------------------------------------------------
 
     print("\n" + underline)
     print("[2] PREPARING AUDIO SAMPLES")
@@ -140,7 +161,9 @@ def demodulate(input_path=None):
     print(f"    Mean amplitude     : {np.mean(audio):.4f}")
     print(f"    RMS amplitude      : {np.sqrt(np.mean(audio**2)):.4f}")
 
-    # STAGE 3: CALCULATE INSTANTANEOUS FREQUENCY
+# -------------------------------------------------------------------------------------
+# # STAGE 3: CALCULATE INSTANTANEOUS FREQUENCY
+# ------------------------------------------------------------------------------------- 
 
     print("\n" + underline)
     print("[3] CALCULATING INSTANTANEOUS FREQUENCY")
@@ -157,7 +180,9 @@ def demodulate(input_path=None):
     print(f"    Maximum frequency : {np.max(inst_freq):.2f} Hz")
     print(f"    Mean frequency    : {np.mean(inst_freq):.2f} Hz")
 
-    # STAGE 4: EXTRACT AFSK1200 SYMBOLS
+# -------------------------------------------------------------------------------------
+# STAGE 4: EXTRACT AFSK1200 SYMBOLS
+# ------------------------------------------------------------------------------------- 
 
     print("\n" + underline)
     print("[4] EXTRACTING AFSK1200 SYMBOLS")
@@ -180,7 +205,9 @@ def demodulate(input_path=None):
     if len(freq_per_bit) > 20:
         print(f"        ... {len(freq_per_bit) - 20} more symbols")
 
-    # STAGE 5: CLASSIFY FREQUENCIES INTO TONES
+# -------------------------------------------------------------------------------------
+# STAGE 5: CLASSIFY FREQUENCIES INTO TONES
+# ------------------------------------------------------------------------------------- 
 
     print("\n" + underline)
     print("[5] CLASSIFYING FREQUENCIES INTO TONES")
@@ -198,7 +225,9 @@ def demodulate(input_path=None):
     print("\n    First 64 classified tones:")
     print("    " + "".join(map(str, tone[:64])))
 
-    # STAGE 6: CONVERT TONES TO DATA BITS
+# -------------------------------------------------------------------------------------
+# STAGE 6: CONVERT TONES TO DATA BITS
+# ------------------------------------------------------------------------------------- 
 
     print("\n" + underline)
     print("[6] CONVERTING TONES TO DATA BITS")
@@ -208,7 +237,9 @@ def demodulate(input_path=None):
     print("    First 64 data bits :")
     print("    " + "".join(map(str, data_bits[:64])))
 
-    # STAGE 7: RECONSTRUCT BYTES
+# -------------------------------------------------------------------------------------
+# STAGE 7: RECONSTRUCT BYTES
+# ------------------------------------------------------------------------------------- 
 
     print("\n" + underline)
     print("[7] RECONSTRUCTING BYTES")
@@ -232,7 +263,9 @@ def demodulate(input_path=None):
                 f"char={repr(char)}"
             )
 
-    # STAGE 8: FINAL DECODE SUMMARY
+# -------------------------------------------------------------------------------------
+# STAGE 8: FINAL DECODE SUMMARY
+# ------------------------------------------------------------------------------------- 
 
     print("\n" + underline)
     print("[8] DEMODULATION SUMMARY")
@@ -254,6 +287,4 @@ def demodulate(input_path=None):
 # ============================================================
 
 if __name__ == "__main__":
-    # GUI launches this script with the selected file path as argv[1].
-    # Running it manually without arguments retains the interactive workflow.
-    demodulate(sys.argv[1] if len(sys.argv) > 1 else None)
+    demodulate()
