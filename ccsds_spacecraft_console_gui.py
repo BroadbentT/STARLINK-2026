@@ -691,7 +691,7 @@ class SpacecraftGUI(tk.Tk):
             if self.endpoint_var.get().strip():
                 raise ValueError("Correct the Target endpoint field or clear it before continuing.")
         result = {}
-        ranges = {"port": (1, 65535),"port2": (1, 65535),"spacecraft_id": (0, 1023),"virtual_channel_id": (0, 63),"apid": (0, 2047),"packet_count": (0, 16383),"tc_packet_count": (0, 255),}
+        ranges = {"port": (1, 65535),"port2": (0, 65535),"spacecraft_id": (0, 1023),"virtual_channel_id": (0, 63),"apid": (0, 2047),"packet_count": (0, 16383),"tc_packet_count": (0, 255),}
         result["host"] = self.vars["host"].get().strip()
         if not result["host"]:
             raise ValueError("Target host cannot be empty.")
