@@ -206,7 +206,7 @@ python3 ccsds_spacecraft_console.py
 | -------- | -----------------------------     | ----------------------           | ------- |
 | python3  | 0c3c85af61b24490f1208da8fdc01ed3  | adTelecommand.py                 | Alpha   |
 | python3  | 31ff54d66c79ed0a4a1c12b5b3cca145  | antennaPointing.py               | Alpha   |
-| python3  | 6b147987b6439e0ccf60abb51f586a8d  | ccsds_spacecraft_console_gui.py  | Alpha   |
+| python3  | 0a6d9b0ef49123675bbd12891451e512  | ccsds_spacecraft_console_gui.py  | Alpha   |
 | python3  | 3ca5aca06deb967860692269fb70b90f  | firstContact.py                  | Alpha   |
 | python3  | 82fa8ab5bc0ba0d37526da7cb2c72af1  | groundStationBreach.py           | Alpha   |
 | python3  | a21132ea2f2dc220198765408fd544e7  | scalpedPlatform.py               | Alpha   |
@@ -214,6 +214,7 @@ python3 ccsds_spacecraft_console.py
 | python3  | 70ddbedeb3336f1df8cdbd17c178922c  | signalFromSpace.py               | Alpha   |
 | python3  | cdb12ef696f4aeeca20d7f599c7c5db8  | tmTelecommand.py                 | Alpha   |
 | python3  | d638e8da04e0538d0f6ca6c39d8af775  | viewPacket.py                    | Alpha   |
+| Python3  | 31ce1b92a9e29974450a167196e2c38f  | createWaveFile.py                | Alpha   |
 
 
 ## LEGAL & ETHICAL USE

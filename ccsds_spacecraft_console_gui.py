@@ -200,6 +200,7 @@ class SpacecraftGUI(tk.Tk):
         right_workspace.pack(fill="both", expand=True)
         operations_frame = ttk.LabelFrame(right_workspace, text="Operations — full menu", padding=8)
         right_workspace.add(operations_frame, weight=2)
+
         operation_specs = [
             ("Preview CCSDS Frame",self.run_preview, True),
             ("Check Connection to Spacecraft", self.test_connection, True),
@@ -210,6 +211,7 @@ class SpacecraftGUI(tk.Tk):
             ("Automated Tracking System", self.run_automated_tracking, True),
             ("Breach Ground Station", self.run_groundstation_security_check, True),
             ("Demodulate AFSK 1200 Telecommand Signal", self.run_afsk_demodulator, True),
+            ("Create AFSK 1200 Telecommand Signal", self.run_afsk_wavefile, True),
             ("Transmit AFSK 1200 Telecommand Signal", self.run_afsk_telecommand, False),
             ("Clear connection", self.run_clear, True),
             ("Exit", self.destroy, True),]
@@ -218,6 +220,7 @@ class SpacecraftGUI(tk.Tk):
             button.grid(row=index // 2, column=index % 2, sticky="ew", padx=4, pady=3)
             if not enabled:
                 button.configure(state="disabled")
+
         operations_frame.columnconfigure(0, weight=1)
         operations_frame.columnconfigure(1, weight=1)
         output_frame = ttk.LabelFrame(right_workspace, text="Output", padding=8)
@@ -321,7 +324,7 @@ class SpacecraftGUI(tk.Tk):
 
     def run_eeprom_inspection(self):
         if not messagebox.askyesno("Confirm EEPROM Dump Command","This will launch scalpedPlatform.py.",parent=self,):
-            self.log("INFO", "EEPROM dump cancelled by user")
+            self.log("INFO", "EEPROM dump cancelled by user.")
             return
         self._run_config_script("scalpedPlatform.py","EEPROM Dump")
 
@@ -335,7 +338,7 @@ class SpacecraftGUI(tk.Tk):
 
     def run_pass_prediction(self):
         if not messagebox.askyesno("Confirm pass prediction system","This launches firstContact.py, which may control physical antenna hardware.\n\n" f"Target: {self.vars['host'].get().strip()}:{self.vars['port'].get().strip()}\n\n"  "Only continue if you are authorised and the antenna system is safe to move.",parent=self,):
-            self.log("INFO", "Pass prediction system cancelled by user")
+            self.log("INFO", "Pass prediction system cancelled by user.")
             return
         self._run_config_script("firstContact.py", "Pass Prediction System")
 
@@ -349,7 +352,7 @@ class SpacecraftGUI(tk.Tk):
 
     def run_automated_tracking(self):
         if not messagebox.askyesno("Confirm automated tracking","This launches antennaPointing.py, which may control physical antenna hardware.\n\n" f"Target: {self.vars['host'].get().strip()}:{self.vars['port'].get().strip()}\n\n" "Only continue if you are authorised and the antenna system is safe to move.",parent=self,):
-            self.log("INFO", "Automated tracking cancelled by user")
+            self.log("INFO", "Automated tracking cancelled by user.")
             return
         self._run_config_script("antennaPointing.py", "Automated Tracking System")
 
@@ -363,9 +366,23 @@ class SpacecraftGUI(tk.Tk):
 
     def run_groundstation_security_check(self):
         if not messagebox.askyesno("Confirm groundstation breach","This launches groundStationBreach.py, which will attempt to breach ground station systems.\n\n" f"Target: {self.vars['host'].get().strip()}:{self.vars['port'].get().strip()}\n\n" "Only continue if you are authorised and you have the appropriate permissions.",parent=self,):
-            self.log("INFO", "Groundstation breach cancelled by user")
+            self.log("INFO", "Groundstation breach cancelled by user.")
             return
         self._run_config_script("groundStationBreach.py", "Ground station breach")
+
+# ------------------------------------------------------------------------------------- 
+# AUTHOR  : Terence Broadbent                                                    
+# CONTRACT: GitHub
+# Version : CORE
+# Details : Create Wave File
+# Modified: N/A
+# -------------------------------------------------------------------------------------
+
+    def run_afsk_wavefile(self):
+        if not messagebox.askyesno("Confirm AFSK 1200 Telecommand Signal creation.","This launches createWaveFile.py and saves the file as encoded.wav.",parent=self,):
+            self.log("INFO", "AFSK 1200 Telecommand Signal creation cancelled by user.")
+            return
+        self._run_config_script("createWaveFile.py", "AFSK 1220 signal transmission")
 
 # ------------------------------------------------------------------------------------- 
 # AUTHOR  : Terence Broadbent                                                    
@@ -394,7 +411,7 @@ class SpacecraftGUI(tk.Tk):
         self.payload_text.delete("1.0", "end")
         self.payload_text.insert("1.0", audio_path)
         if not messagebox.askyesno("Confirm AFSK 1200 Demodulator Command","This will launch signalFromSpace.py.",parent=self,):
-            self.log("INFO", "AFSK 1200 demodulator cancelled by user")
+            self.log("INFO", "AFSK 1200 demodulator cancelled by user.")
             return
         self._run_config_script("signalFromSpace.py","AFSK 1200 Demodulator")
 
@@ -409,7 +426,7 @@ class SpacecraftGUI(tk.Tk):
 
     def run_afsk_telecommand(self):
         if not messagebox.askyesno("Confirm AFSK 1200 signal transmission","This launches spaceOps.py, which may control physical antenna hardware.\n\n" f"Target: {self.vars['host'].get().strip()}:{self.vars['port'].get().strip()}\n\n" "Only continue if you are authorised and the antenna system is safe to move.",parent=self,):
-            self.log("INFO", "AFSK 1200 signal trasnsmission cancelled by user")
+            self.log("INFO", "AFSK 1200 signal trasnsmission cancelled by user.")
             return
         self._run_config_script("spaceOps.py", "AFSK 1220 signal transmission")
 
@@ -423,7 +440,7 @@ class SpacecraftGUI(tk.Tk):
 
     def run_clear(self):
         if not messagebox.askyesno("Clear Connection","This will reset all connection parameters, packet counters, " "payload data and selected files to their default values.\n\nContinue?",parent=self):
-            self.log("INFO", "clear connection cancelled by user")
+            self.log("INFO", "clear connection cancelled by user.")
             return
         for key, value in DEFAULTS.items():
             if key == "payload":
